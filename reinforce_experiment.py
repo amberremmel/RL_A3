@@ -28,15 +28,19 @@ def average_over_repetitions(n_repetitions, n_episodes=250,
     print('Running one setting takes {} minutes'.format((time.time()-now)/60))    
     learning_curve = np.mean(reward_results,axis=0) # average over repetitions
     learning_curve = smooth(learning_curve,smoothing_window) # additional smoothing
-    return learning_curve  
+    learning_std = np.std(reward_results,axis=0)
+    learning_min = np.min(reward_results,axis=0)
+    learning_max = np.max(reward_results,axis=0)
+    
+    return learning_curve, learning_std, learning_min, learning_max 
 
 def experiment():
     ####### Settings
     # Experiment    
-    n_repetitions = 10
-    smoothing_window = 21
+    n_repetitions = 3
+    smoothing_window = 21 #kan weg
 
-    n_episodes = 1000
+    n_episodes = 10
     gamma = 0.8
     learning_rate = 0.005
     
@@ -50,9 +54,10 @@ def experiment():
     
     Plot = LearningCurvePlot(title = 'Reinforce')
     
-    learning_curve = average_over_repetitions(n_repetitions, n_episodes,
+    learning_curve, learning_std, learning_min, learning_max = average_over_repetitions(n_repetitions, n_episodes,
                learning_rate, gamma, n_nodes, render, smoothing_window)
-    Plot.add_curve(learning_curve,label="")
+    print(learning_min.shape)
+    Plot.add_curve(learning_curve, learning_std, learning_min, learning_max)
     Plot.save('reinforce.png')
     
     

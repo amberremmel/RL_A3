@@ -4,7 +4,7 @@
 Practical for course 'Reinforcement Learning',
 Leiden University, The Netherlands
 2021
-By Thomas Moerland
+By Thomas Moerland altered by 
 """
 
 import numpy as np
@@ -20,13 +20,16 @@ class LearningCurvePlot:
         if title is not None:
             self.ax.set_title(title)
         
-    def add_curve(self,y,label=None):
+    def add_curve(self, y, learning_std, learning_min, learning_max, label=None):
         ''' y: vector of average reward results
-        label: string to appear as label in plot legend '''
-        if label is not None:
-            self.ax.plot(y,label=label)
-        else:
-            self.ax.plot(y)
+        learning_std: 
+        learning_std
+        learning_std'''
+        self.ax.fill_between([*range(len(y))], y-learning_std, y+learning_std, alpha = 0.3, label='std')
+        self.ax.plot(y, color = "tab:blue", label = "smoothed average")
+        self.ax.plot(learning_min, color = "tab:blue", linestyle='dashed', label='min/max', alpha = 0.5)
+        self.ax.plot(learning_max, color = "tab:blue", linestyle='dashed', alpha = 0.5)
+            
     
     def set_ylim(self,lower,upper):
         self.ax.set_ylim([lower,upper])
