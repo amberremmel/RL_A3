@@ -83,6 +83,19 @@ def parameter_sweep(parameters, title, filename):
         Plot.add_curve(learning_curve, std, min, max, label=label)
         Plot.save(filename + '.png')
         np.save(filename, results)
+        return Plot, results
+
+
+def ablation():
+    parameters = {"bootstrapping" : [True, False],
+                  "baseline_subtraction" : [True, False]}
+    Plot, results = parameter_sweep(parameters, "Ablation Study", "ablation")
+    learning_curve, all_repetitions, max, min, std = average_over_repetitions(algorithm=reinforce)
+    Plot.add_curve(learning_curve, std, min, max, label="Reinforce")
+    Plot.save("ablation.png")
+    results = np.append(results, all_repetitions)
+    np.save("ablation.npy", results)
+
 
 
 def experiment():
