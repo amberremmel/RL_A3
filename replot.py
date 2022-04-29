@@ -55,7 +55,8 @@ def get_curves(experiment, smoothing_window = 51):
 
 def make_label_for_curve(variables, setting):
     names = [index_to_var_name(i) for i in variables]
-    label = [name + " = " + str(setting) for name in names]
+    vars = [var for var in setting]
+    label = [name + " = " + str(var) for name, var in zip(names, vars)]
     label = ", ".join(label)
     label = label.replace("learning_rate", "$\\alpha$")
     label = label.replace("gamma", '$\gamma$')
@@ -82,4 +83,15 @@ def replot(filename, title, smoothing_window = 51):
 
 
 if __name__ == '__main__':
-    replot('Full_AC_layers.npy', title='Effect of increasing number of layers')
+
+    replot('alpha_gamma.npy', title = 'Gridsearch alpha and gamma')
+
+    replot('alpha_depth.npy', title = 'Gridsearch alpha and depth')
+
+    replot('Full_AC_layers.npy', title ='Effect of increasing number of layers')
+
+    replot('Full_AC_learning_rate.npy', title='Effect of changing learning rate')
+
+    replot('Full_AC_gamma.npy', title="Effect of changing discount factor")
+
+    replot('bootstrapping_depth.npy', title='Effect of increasing bootstrapping depth')
