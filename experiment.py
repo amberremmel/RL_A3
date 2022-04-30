@@ -83,7 +83,7 @@ def parameter_sweep(parameters, title, filename):
         Plot.add_curve(learning_curve, std, min, max, label=label)
         Plot.save(filename + '.png')
         np.save(filename, results)
-        return Plot, results
+    return Plot, results
 
 
 def ablation():
@@ -101,10 +101,12 @@ def ablation():
 def experiment():
 
 
-    parameters = {'bootstrapping_depth' : [50, 100, 20, 10, 200, 5, 1],
+    parameters = {'bootstrapping_depth' : [5, 20, 50, 100, 150, 200],
                   'n_episodes' : [1000],
                   'n_repetitions' : [5]}
     parameter_sweep(parameters, 'Bootstrapping depth', 'bootstrap_large')
+
+    ablation()
 
     '''
     parameters = {'n_nodes' : [[32, 16],
