@@ -16,7 +16,7 @@ from actor_critic import actor_critic
 from Helper import LearningCurvePlot, smooth
 
 
-def average_over_repetitions(algorithm = reinforce, n_repetitions = 10,
+def average_over_repetitions(algorithm = actor_critic, n_repetitions = 10,
                              n_episodes=1500, learning_rate=0.001, gamma=1.0, n_nodes=[64, 128],
                              baseline_subtraction=True, bootstrapping=True, bootstrapping_depth=1,
                              render=False, print_episodes=False, smoothing_window=51):
@@ -102,11 +102,11 @@ def experiment():
 
 
     parameters = {'bootstrapping_depth' : [5, 20, 50, 100, 150, 200],
-                  'n_episodes' : [1000],
-                  'n_repetitions' : [5]}
+                  'n_episodes' : [100],
+                  'n_repetitions' : [1]}
     parameter_sweep(parameters, 'Bootstrapping depth', 'bootstrap_large')
 
-    ablation()
+    #ablation()
 
     '''
     parameters = {'n_nodes' : [[32, 16],
