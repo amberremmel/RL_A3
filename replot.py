@@ -31,6 +31,14 @@ def infer_variables(experiments):
     for j, item in enumerate(zip(*settings)):
         if j == 5:
             item = [tuple(v) for v in item]
+        if j == 0: # extract the algorithms properly
+            algorithms = []
+            for str in item:
+                if 'reinforce' in str:
+                    algorithms.append('reinforce')
+                if 'actor critic' in str:
+                    algorithms.append('actor critic')
+            item = algorithms
         n_unique = len(set(item))
         if n_unique>1:
             variables.append(j)
@@ -65,7 +73,14 @@ def make_label_for_curve(variables, setting):
     return label
 
 def replot(filename, title, smoothing_window = 51):
-    results = np.load(filename, allow_pickle=True)
+    if type(filename) is list:
+        results_list = [np.load(file, allow_pickle=True) for file in filename]
+        results = results_list.pop(0)
+        for arr in results_list:
+            results = np.append(results, arr)
+        filename = filename[0]
+    else:
+        results = np.load(filename, allow_pickle=True)
     #print(results)
     variables = infer_variables(results)
     n_experiments = int(len(results)/10)
@@ -83,7 +98,8 @@ def replot(filename, title, smoothing_window = 51):
 
 
 if __name__ == '__main__':
-
+    replot(["../results parameter tuning/bootstrapping_depth_1_5_20.npy", "../results parameter tuning/bootstrapping_depth.npy"], title='Bootstrapping depth')
+    '''
     replot('alpha_gamma.npy', title = 'Gridsearch alpha and gamma')
 
     replot('alpha_depth.npy', title = 'Gridsearch alpha and depth')
@@ -95,3 +111,4 @@ if __name__ == '__main__':
     replot('Full_AC_gamma.npy', title="Effect of changing discount factor")
 
     replot('bootstrapping_depth.npy', title='Effect of increasing bootstrapping depth')
+    '''
