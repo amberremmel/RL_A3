@@ -57,12 +57,12 @@ def actor_critic(n_episodes=250, learning_rate=0.05, gamma=1,
     reward_per_episode = []
     
     # Make the CartPole environment
-    env = gym.make("CartPole-v1")
+    env = gym.make("CartPole-v0")
 
     grad = 0
 
-
     for i in range(n_episodes):
+        #initialise the lists for collecting data, and initialise enviroment
         rewards = []
         actions = []
         probabilities = []
@@ -70,8 +70,9 @@ def actor_critic(n_episodes=250, learning_rate=0.05, gamma=1,
         state = env.reset()
         state = np.reshape(state, [1, 4])
         done = False
+        #initialise GradientTape, this helps determine the gradient of the network when it needs to be updated
         with tf.GradientTape() as tape:
-            while not done:
+            while not done:  # run the enviroment until the end of the episode, and store the relevant details about the state and actions taken
                 if render:
                     env.render()
 
@@ -91,40 +92,37 @@ def actor_critic(n_episodes=250, learning_rate=0.05, gamma=1,
                 predictions.append(prediction)
                 state = next_state
 
-
+            # after the episode finishes, then calculate total reward obtained
             reward_per_episode.append(np.sum(rewards))
 
-
+            #calculate loss for the policy head and the actor head.
             actor_losses = []
             critic_losses = []
             R = 0
-            #for action, reward, probs, prediction in episode[::-1]:
-            for j in range(len(actions)-1, -1, -1):
+            for j in range(len(actions)-1, -1, -1): # calculate the policy loss and value loss for each timestep
                 action, reward, probs, prediction = actions[j], rewards[j], probabilities[j], predictions[j]
-
-                if bootstrapping:
+                if bootstrapping:   # Use bootstrapping in the reward function if it is enabled
                     k = min(j + bootstrapping_depth, len(actions) - 1) - j # get the bootstrapping depth, minding the end of the episode
                     if k == bootstrapping_depth: # if the episode is longer than the bootstrapping depth, then use estimated value
-                        R = np.sum([rewards[j+z]*(agent.gamma) ** z for z in range(k)])+predictions[j + k]*(agent.gamma ** k)
+                        R = np.sum([rewards[j+z]*(agent.gamma ** z) for z in range(k)])+predictions[j + k]*(agent.gamma ** k)
                     else: # if the bootstrapping depth is longer than the rest of the episode, then use actual rewards.
-                        R = np.sum([rewards[j+z]*(agent.gamma) ** z for z in range(k)])
-
+                        R = np.sum([rewards[j+z]*(agent.gamma ** z) for z in range(k)])
                 else:
-                    R = gamma * R + reward
+                    R = gamma * R + reward # use standard discounted rewards if bootstrapping is disabled
 
                 if baseline_subtraction:
-                    loss = (R - prediction) * -tf.math.log(probs[0][action])
-
+                    loss = (R - prediction) * -tf.math.log(probs[0][action]) #perform baseline subtraction if enabled
                 else:
                     loss = R * -tf.math.log(probs[0][action])
 
                 actor_losses.append(loss)
-                #print(prediction, R)
-                critic_loss = tf.pow(prediction - R, 2)
+                critic_loss = tf.pow(prediction - R, 2) # calculate critic loss, simple squared error for each timestep, comparing the prediction and the obtained discounted rewards
                 critic_losses.append(critic_loss)
+            # calculate total loss, update gradient, and perform the update step
             total_loss = sum(actor_losses) + sum((critic_losses))
             gradient = tape.gradient(total_loss, agent.model.trainable_weights)
             agent.optimizer.apply_gradients(zip(gradient, agent.model.trainable_weights))
+            #end of episode, GradientTape is used, new tape is initalised at the top of the loop
 
         if print_episodes:
             print("episode: ", i, " score: ", reward_per_episode[-1])

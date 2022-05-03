@@ -1,11 +1,9 @@
 import gym
 
-import random
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-from collections import deque
 import time
 
 
@@ -47,7 +45,7 @@ class Reinforce:
         return model
 
 
-def reinforce(n_episodes=250, learning_rate=0.05, gamma=1,
+def reinforce(n_episodes=1500, learning_rate=0.001, gamma=1,
                n_nodes=[32, 16], baseline_subtraction = False, bootstrapping = False, bootstrapping_depth = 1,
                render=False, print_episodes=False):
     ''' runs a single repetition of Reinforce
@@ -58,7 +56,7 @@ def reinforce(n_episodes=250, learning_rate=0.05, gamma=1,
     reward_per_episode = []
     
     # Make the CartPole environment
-    env = gym.make("CartPole-v1")
+    env = gym.make("CartPole-v0")
 
     grad = 0
     
