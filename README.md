@@ -1,5 +1,5 @@
 ## Reinforcement learning Assignment 3: Policy-based RL
-To obtain the graphs that are presented in the report experiment.py can be called. The file experiment.py uses the two files called Helper.py, reinforce.py and actor_critic.py. Helper.py consists of the functions to make and smooth the plots. The file reinforce.py has the reinforce algorithm in it. The file actor_critic.py has the actor-critic algorithm with bootstrap and baseline subtraction in it. The file experiment.py creates two files, a data file with the data of the curves and a plot of the experimented curves.
+To obtain the graphs that are presented in the report experiment.py can be called. The file experiment.py uses tree files: Helper.py, reinforce.py and actor_critic.py. Helper.py consists of the functions to make and smooth the plots. The file reinforce.py has the reinforce algorithm in it. The file actor_critic.py has the actor-critic algorithm with bootstrap and baseline subtraction in it. The file experiment.py creates two files, a data file with the data of the curves and a plot of the experimented curves.
 
 The replot.py file can use the data files created by experiment.py to combine curves in a new plot.
 
