@@ -119,3 +119,4 @@ if __name__ == '__main__':
 
     else:
         print("Usage: python replot.py \"filename\" \"plot title\"")
+        print("To combine multiple files into one plot, replace the parameter filename with \"[filename1, filename2, ...]\"")
