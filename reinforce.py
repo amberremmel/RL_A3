@@ -47,10 +47,9 @@ class Reinforce:
 
 def reinforce(n_episodes=1500, learning_rate=0.001, gamma=1,
                n_nodes=[32, 16], baseline_subtraction = False, bootstrapping = False, bootstrapping_depth = 1,
-               render=False, print_episodes=False):
+               render=False, print_episodes=False, environment='CartPole-v0'):
     ''' runs a single repetition of Reinforce
     Return: rewards, a vector with the observed rewards at each timestep '''
-
     agent = Reinforce(gamma=gamma, learning_rate=learning_rate)
 
     reward_per_episode = []
@@ -61,13 +60,21 @@ def reinforce(n_episodes=1500, learning_rate=0.001, gamma=1,
     grad = 0
     
     for i in range(n_episodes):
+        #run each episode, initialise the storage of the rewards and states
         rewards = []
         state = env.reset()
         state = np.reshape(state, [1, 4])
         episode = []
         done = False
         with tf.GradientTape() as tape:
+            '''
+            GradientTape enables the automated calculation of the gradient over the whole episode.
+            it requires that all operations on the data occur within the same context.
+            in order to achieve this, both the running of the episode, and the calculation of the loss are done within 
+            the same function
+            '''
             while not done:
+                #Run the episode
                 if render:
                     env.render()
 
@@ -82,16 +89,21 @@ def reinforce(n_episodes=1500, learning_rate=0.001, gamma=1,
                 rewards.append(reward)
                 state = next_state
 
-
+            #After end of episode, calculate the total reward obtained in the episode.
             reward_per_episode.append(np.sum(rewards))
 
+            #Calculate the loss of the network, and update the network
             losses = []
             R = 0
             for action, reward, probabillities in episode[::-1]:
+                #moving backwards through the episode allows for a simple calculation of the discounted rewards
                 R = gamma * R + reward
+                #the loss is weighted for the probability of taking that given action
+                # if the action was improbable, then the result is weighted more compared to a likely action
                 loss = R * -tf.math.log(probabillities[0][action])
                 losses.insert(0, loss)
             total_loss = sum(losses)
+            #the gradient is automatically calculated by the GradientTape according to the calculated loss.
             gradient = tape.gradient(total_loss, agent.model.trainable_weights)
             agent.optimizer.apply_gradients(zip(gradient, agent.model.trainable_weights))
 

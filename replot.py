@@ -6,6 +6,7 @@ Leiden University, The Netherlands
 2021
 By Thomas Moerland
 """
+import sys
 
 import numpy as np
 import time
@@ -18,10 +19,14 @@ def index_to_var_name(x):
                  'n_episodes', 'learning_rate',
                  'gamma', 'n_nodes',
                  'baseline_subtraction', 'bootstrapping',
-                 'bootstrapping_depth', 'results']
+                 'n', 'results']
     return var_names[x]
 
 def infer_variables(experiments):
+    """Given a numpy array with the data about some number of experiments, determine what variables change between the
+    different experiments, and return a list with the index of these variables
+    instead of a single npy file, experiments may consist of a list of npy files, then these will be concatenated in that order
+    and a plot is made of all the learning curves contained within those files."""
     n_experiments = int(len(experiments)/10)
     settings = []
     variables = []
@@ -30,8 +35,10 @@ def infer_variables(experiments):
         settings.append(setting)
     for j, item in enumerate(zip(*settings)):
         if j == 5:
+            # The number of nodes is represented as a list, but should be converted to a tuple for equality checking
             item = [tuple(v) for v in item]
-        if j == 0: # extract the algorithms properly
+        if j == 0:
+            # extract the algorithms properly, the location in memory is also stored within the dataframe, but this information is unhelpful
             algorithms = []
             for str in item:
                 if 'reinforce' in str:
@@ -39,6 +46,9 @@ def infer_variables(experiments):
                 if 'actor critic' in str:
                     algorithms.append('actor critic')
             item = algorithms
+        #make a set of the list of the settings for a given parameter, if only one unique parameter was used, i.e.
+        #if the parameter was not changed, then the length of the set will be 1. if the parameter was changed, then the
+        #length will be more than 1.
         n_unique = len(set(item))
         if n_unique>1:
             variables.append(j)
@@ -62,17 +72,23 @@ def get_curves(experiment, smoothing_window = 51):
     return mean, std, min, max
 
 def make_label_for_curve(variables, setting):
+    """Automatically make the labels for the plot, based on what parameters were changed in the different runs"""
     names = [index_to_var_name(i) for i in variables]
     vars = [var for var in setting]
     label = [name + " = " + str(var) for name, var in zip(names, vars)]
     label = ", ".join(label)
     label = label.replace("learning_rate", "$\\alpha$")
     label = label.replace("gamma", '$\gamma$')
+    label = label.replace("bootstrapping_depth", "n")
+    label = label.replace("bootstrapping", 'B')
+    label = label.replace("baseline_subtraction", "BS")
     label = label.replace("_", " ")
     label = r'{}'.format(label)
     return label
 
-def replot(filename, title, smoothing_window = 51):
+def replot(filename, title):
+    """Given a npy file, make a new plot of the data contained within. this function is mostly used to change some of
+    the plotting parameters"""
     if type(filename) is list:
         results_list = [np.load(file, allow_pickle=True) for file in filename]
         results = results_list.pop(0)
@@ -98,17 +114,8 @@ def replot(filename, title, smoothing_window = 51):
 
 
 if __name__ == '__main__':
-    replot(["../results parameter tuning/bootstrapping_depth_1_5_20.npy", "../results parameter tuning/bootstrapping_depth.npy"], title='Bootstrapping depth')
-    '''
-    replot('alpha_gamma.npy', title = 'Gridsearch alpha and gamma')
+    if len(sys.argv) == 3:
+        replot(sys.argv[1], sys.argv[2])
 
-    replot('alpha_depth.npy', title = 'Gridsearch alpha and depth')
-
-    replot('Full_AC_layers.npy', title ='Effect of increasing number of layers')
-
-    replot('Full_AC_learning_rate.npy', title='Effect of changing learning rate')
-
-    replot('Full_AC_gamma.npy', title="Effect of changing discount factor")
-
-    replot('bootstrapping_depth.npy', title='Effect of increasing bootstrapping depth')
-    '''
+    else:
+        print("Usage: python replot.py \"filename\" \"plot title\"")

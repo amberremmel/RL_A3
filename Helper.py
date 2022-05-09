@@ -23,13 +23,14 @@ class LearningCurvePlot:
 
     def add_curve(self, y, learning_std, learning_min, learning_max, label=None):
         ''' y: vector of average reward results
-        learning_std:
-        learning_std
-        learning_std'''
+        learning_std: The standard deviation of the performance at a given timestep.
+        learning_min: the lowest reward obtained by the algorithm at any given timestep in the repetitions
+        learning_max: the highest reward obtained by the algorithm at any given timestep in the repetitions
+        label: The label used for the plot '''
         self.ax.plot(y, label=label)
+        # use the same color for all lines and fills concerning the same data
         color = self.ax.get_lines()[-1].get_color()
 
-        #self.ax.fill_between([*range(len(y))], learning_min, learning_max, alpha=0.1, color=color)
         self.ax.fill_between([*range(len(y))], y - learning_std, y + learning_std, alpha=0.1, color=color)
         self.ax.plot(learning_min,  linestyle='dashed', alpha=0.4, color=color)
         self.ax.plot(learning_max, linestyle='dashed', alpha=0.4, color=color)
