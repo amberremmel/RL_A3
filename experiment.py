@@ -4,7 +4,7 @@
 Practical for course 'Reinforcement Learning',
 Leiden University, The Netherlands
 2021
-By Thomas Moerland
+By Thomas Moerland altered by Ricardo Michels, Paula Mieras and Amber Remmelzwaal
 """
 
 import numpy as np
