@@ -155,13 +155,13 @@ def experiment(study):
         parameters= {'gamma': [1.1, 1.0, 0.9, 0.8, 0.7, 0.6]}
         parameter_sweep(parameters, "Varying the discount factor", 'discount_factor')
 
-        parameters = {'bootstrap_depth': [1, 3, 5, 10, 15, 20]}
+        parameters = {'bootstrapping_depth': [1, 3, 5, 10, 15, 20]}
         parameter_sweep(parameters, "Varying the boostrapping depth", 'bootstrap_depth')
 
-        parameters = {'layers': [[32, 16], [16, 32, 16], [32, 16, 32, 16], [64, 128]]}
+        parameters = {'n_nodes': [[32, 16], [16, 32, 16], [32, 16, 32, 16], [64, 128]]}
         parameter_sweep(parameters, "Varying the number of layers", 'layers')
 
-        parameters = {'layers': [[32], [64], [128], [32, 16]]}
+        parameters = {'n_nodes': [[32], [64], [128], [32, 16]]}
         parameter_sweep(parameters, "Single hidden layer", 'single_layer')
 
         parameters = {'learning_rate': [0.01, 0.005],
@@ -188,6 +188,7 @@ if __name__ == '__main__':
         experiment(study)
 
     else:
+        print("Run python 'experiment.py all' to run all studies.")
         print("Run python 'experiment.py optimization' to get the optimization study.")
         print("Run python 'experiment.py gridsearch' to get only the gridsearch from the optimization study.")
         print("Run python 'experiment.py ablation' to get the ablation study.")

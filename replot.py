@@ -114,9 +114,11 @@ def replot(filename, title):
 
 
 if __name__ == '__main__':
+    """if multiple files need to be combined, then instead of a single filename, 
+    a list of the required filenames can be passed to the replot function"""
     if len(sys.argv) == 3:
         replot(sys.argv[1], sys.argv[2])
 
     else:
         print("Usage: python replot.py \"filename\" \"plot title\"")
-        print("To combine multiple files into one plot, replace the parameter filename with \"[filename1, filename2, ...]\"")
+        print("To combine multiple files into one plot, a new line of code should be written in this file, instructions can be found within")
